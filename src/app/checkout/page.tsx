@@ -1,13 +1,14 @@
-// src/app/checkout/page.tsx
 "use client"; // クライアントサイドコンポーネントにする
 
 import { useState } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
+import { useCart } from "../../context/CartContext"; // カートコンテキストをインポート
 
 const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
+  const { subtotal, taxAmount, shippingFee, totalAmount } = useCart(); // カートの合計情報を取得
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -29,7 +30,7 @@ const CheckoutPage = () => {
     const res = await fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 1000 }), // 商品の価格
+      body: JSON.stringify({ amount: totalAmount }), // 合計金額を送信
     });
 
     const { clientSecret } = await res.json();
@@ -57,6 +58,16 @@ const CheckoutPage = () => {
   return (
     <div className="container">
       <h2>商品購入ページ</h2>
+
+      {/* 合計金額の表示 */}
+      <div className="order-summary my-4">
+        <h4>注文概要</h4>
+        <p>小計: ¥{subtotal.toLocaleString()}</p>
+        <p>消費税: ¥{taxAmount.toLocaleString()}</p>
+        <p>送料: ¥{shippingFee.toLocaleString()}</p>
+        <h3>合計: ¥{totalAmount.toLocaleString()}</h3>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="card-element" className="form-label">
