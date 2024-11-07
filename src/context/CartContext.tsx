@@ -1,47 +1,36 @@
 // src/context/CartContext.tsx
-import React, { createContext, useContext, useState } from "react";
+"use client";
 
-// 商品情報の型定義
-export type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  description: string;
-};
+import { createContext, useContext, useState, ReactNode } from "react";
+import { Product } from "../types";
 
-// CartContextの型定義
-type CartContextType = {
+interface CartContextType {
   cart: Product[];
-  addToCart: (product: Product) => void;
-  removeItem: (productId: number) => void; // 型を明示的に指定
-};
+  addItem: (product: Product) => void;
+  removeItem: (productId: number) => void;
+}
 
-// CartContextの作成
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<Product[]>([]);
 
-  // 商品をカートに追加する関数
-  const addToCart = (product: Product) => {
-    setCart((prevCart) => [...prevCart, product]);
+  const addItem = (product: Product) => {
+    setCart((prev) => [...prev, product]);
   };
 
-  // 商品をカートから削除する関数
   const removeItem = (productId: number) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+    setCart((prev) => prev.filter((item) => item.id !== productId));
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeItem }}>
+    <CartContext.Provider value={{ cart, addItem, removeItem }}>
       {children}
     </CartContext.Provider>
   );
 };
 
-// useCartフックの作成
-export const useCart = () => {
+export const useCart = (): CartContextType => {
   const context = useContext(CartContext);
   if (!context) {
     throw new Error("useCart must be used within a CartProvider");

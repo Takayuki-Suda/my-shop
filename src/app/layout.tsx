@@ -1,5 +1,5 @@
 // src/app/layout.tsx
-"use client";
+"use client"; // クライアントサイドコンポーネントとして動作することを指定
 
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body>
+        {/* ヘッダー */}
         <header>
           <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container-fluid">
@@ -60,6 +61,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
         {/* CartProviderをページ全体でラップ */}
         <CartProvider>
+          {/* Stripe Elementsでラップ */}
           <Elements stripe={stripePromise}>
             <main>{children}</main>
           </Elements>

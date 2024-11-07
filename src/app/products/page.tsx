@@ -1,83 +1,36 @@
+// src/app/products/page.tsx
 "use client";
 
-import { useCart } from "../../context/CartContext";
-import { Product } from "../../context/CartContext";
-import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useCart } from "../../context/CartContext"; // useCart をインポート
+import { Product } from "../../types"; // Product型のインポート
+import { toast } from "react-toastify"; // トースト通知のためのインポート
+import ProductItem from "../../components/ProductItem"; // 商品アイテムコンポーネントのインポート
 
-const sampleProducts: Product[] = [
-  {
-    id: 1,
-    name: "商品1",
-    price: 1000,
-    image: "/images/product1.jpg",
-    description: "商品の説明1",
-  },
-  {
-    id: 2,
-    name: "商品2",
-    price: 2000,
-    image: "/images/product2.jpg",
-    description: "商品の説明2",
-  },
-  {
-    id: 3,
-    name: "商品3",
-    price: 3000,
-    image: "/images/product3.jpg",
-    description: "商品の説明3",
-  },
-];
+const ProductPage = () => {
+  const { addItem } = useCart(); // カートに商品を追加する関数を取得
 
-export default function ProductsPage() {
-  const { addToCart, cart } = useCart(); // カートの状態を取得
-
+  // 商品をカートに追加する関数
   const handleAddToCart = (product: Product) => {
-    addToCart(product); // 商品をカートに追加
-    console.log("商品がカートに追加されました:", product); // デバッグ用ログ
+    addItem(product); // 商品をカートに追加
+    toast.success(`${product.name}がカートに入りました！`, {
+      position: "top-right",
+      autoClose: 3000,
+    });
   };
 
-  useEffect(() => {
-    // カートにアイテムが追加されるとトースト通知
-    if (cart.length > 0) {
-      const lastAddedProduct = cart[cart.length - 1];
-      console.log("カートに追加された商品:", lastAddedProduct); // デバッグ用ログ
-
-      // トースト通知を表示（カートが更新されたとき）
-      toast.success(`${lastAddedProduct.name}がカートに入りました！`, {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
-  }, [cart]); // cartの変更に依存して実行
+  const someProduct: Product = {
+    id: 1,
+    name: "商品A",
+    price: 1000,
+    quantity: 1,
+  };
 
   return (
-    <div className="container">
-      <h1>商品一覧</h1>
-      <div className="row">
-        {sampleProducts.map((product) => (
-          <div className="col-12 col-md-4" key={product.id}>
-            <div className="card">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="card-img-top"
-              />
-              <div className="card-body">
-                <h5 className="card-title">{product.name}</h5>
-                <p className="card-text">{product.description}</p>
-                <p className="card-text">¥{product.price}</p>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleAddToCart(product)} // ボタンがクリックされたらカートに追加
-                >
-                  カートに入れる
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div>
+      <h1>商品ページ</h1>
+      <ProductItem product={someProduct} onAddToCart={handleAddToCart} />
     </div>
   );
-}
+};
+
+export default ProductPage;
