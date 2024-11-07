@@ -1,4 +1,3 @@
-// src/app/cart/page.tsx
 "use client";
 
 import { useCart } from "../../context/CartContext"; // useCart をインポート
@@ -28,6 +27,11 @@ const CartPage = () => {
     }
   };
 
+  const handleRemoveFromCart = (productId: number) => {
+    removeItem(productId); // 商品を削除
+    toast.info("商品がカートから削除されました"); // 削除後にトースト通知を表示
+  };
+
   return (
     <div>
       <h1>カートページ</h1>
@@ -39,7 +43,7 @@ const CartPage = () => {
             <div className="col-12 col-md-4 mb-4" key={product.id}>
               <CartItem
                 product={product}
-                onRemove={removeItem}
+                onRemove={handleRemoveFromCart} // 削除ボタンにトースト通知を関連付け
                 onIncrease={() =>
                   handleIncreaseQuantity(product.id, product.quantity)
                 }
