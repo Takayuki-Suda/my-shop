@@ -1,7 +1,13 @@
 // src/context/CartContext.tsx
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { Product } from "../types";
 
 interface CartContextType {
@@ -15,6 +21,23 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<Product[]>([]);
+
+  // ページが読み込まれるときにローカルストレージからカートの内容を取得する
+  useEffect(() => {
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      setCart(JSON.parse(savedCart)); // ローカルストレージに保存されているカート情報をセット
+    }
+  }, []);
+
+  // カートの変更をローカルストレージに保存する
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(cart)); // カートが変更されるたびに保存
+    } else {
+      localStorage.removeItem("cart"); // カートが空の場合、ローカルストレージから削除
+    }
+  }, [cart]);
 
   const addItem = (product: Product) => {
     setCart((prev) => {
@@ -41,7 +64,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeItem = (productId: number) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    setCart((prev) => {
+      const updatedCart = prev.filter((item) => item.id !== productId); // 商品を削除
+      return updatedCart;
+    });
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
@@ -52,7 +78,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       );
 
       if (productIndex !== -1) {
-        updatedCart[productIndex].quantity = quantity;
+        updatedCart[productIndex].quantity = quantity; // 数量を更新
       }
 
       return updatedCart;
