@@ -6,11 +6,26 @@ import { toast } from "react-toastify"; // トースト通知のためのイン�
 import CartItem from "../../components/CartItem"; // カートアイテムコンポーネントのインポート
 
 const CartPage = () => {
-  const { cart, removeItem } = useCart(); // カートの状態と削除機能を取得
+  const { cart, removeItem, updateQuantity } = useCart(); // カートの状態、削除、数量変更機能を取得
 
-  const handleRemoveFromCart = (productId: number) => {
-    removeItem(productId);
-    toast.info("商品がカートから削除されました");
+  const handleIncreaseQuantity = (
+    productId: number,
+    currentQuantity: number
+  ) => {
+    updateQuantity(productId, currentQuantity + 1);
+    toast.success("数量が増えました");
+  };
+
+  const handleDecreaseQuantity = (
+    productId: number,
+    currentQuantity: number
+  ) => {
+    if (currentQuantity > 1) {
+      updateQuantity(productId, currentQuantity - 1);
+      toast.success("数量が減りました");
+    } else {
+      toast.warning("数量は1個未満にはできません");
+    }
   };
 
   return (
@@ -19,13 +34,22 @@ const CartPage = () => {
       {cart.length === 0 ? (
         <p>カートにはアイテムがありません。</p>
       ) : (
-        cart.map((product) => (
-          <CartItem
-            key={product.id}
-            product={product}
-            onRemove={handleRemoveFromCart}
-          />
-        ))
+        <div className="d-flex flex-wrap">
+          {cart.map((product) => (
+            <div className="col-12 col-md-4 mb-4" key={product.id}>
+              <CartItem
+                product={product}
+                onRemove={removeItem}
+                onIncrease={() =>
+                  handleIncreaseQuantity(product.id, product.quantity)
+                }
+                onDecrease={() =>
+                  handleDecreaseQuantity(product.id, product.quantity)
+                }
+              />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
