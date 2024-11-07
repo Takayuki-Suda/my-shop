@@ -18,18 +18,25 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addItem = (product: Product) => {
     setCart((prev) => {
-      const updatedCart = [...prev];
+      const updatedCart = [...prev]; // カートをコピー
+
+      // すでにカートに同じ商品があるかを探す
       const existingProductIndex = updatedCart.findIndex(
         (item) => item.id === product.id
       );
 
       if (existingProductIndex !== -1) {
-        updatedCart[existingProductIndex].quantity += 1;
+        // 既存の商品があれば、数量を+1
+        updatedCart[existingProductIndex] = {
+          ...updatedCart[existingProductIndex],
+          quantity: updatedCart[existingProductIndex].quantity + 1,
+        };
       } else {
+        // 新しい商品は数量1で追加
         updatedCart.push({ ...product, quantity: 1 });
       }
 
-      return updatedCart;
+      return updatedCart; // 更新したカートを返す
     });
   };
 
