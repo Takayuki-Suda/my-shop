@@ -6,6 +6,7 @@ import { useCart } from "../../context/CartContext"; // カートコンテキス
 
 const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
+  const [balance, setBalance] = useState(10000); // 所持金額を10,000円で初期化
   const stripe = useStripe();
   const elements = useElements();
   const { subtotal, taxAmount, shippingFee, totalAmount } = useCart(); // カートの合計情報を取得
@@ -14,7 +15,10 @@ const CheckoutPage = () => {
     event.preventDefault();
     setLoading(true);
 
+    console.log("支払い処理開始");
+
     if (!stripe || !elements) {
+      console.log("StripeまたはElementsが未ロードです");
       setLoading(false);
       return;
     }
@@ -22,19 +26,32 @@ const CheckoutPage = () => {
     const cardElement = elements.getElement(CardElement);
 
     if (!cardElement) {
+      console.log("カード情報の取得に失敗しました");
       alert("カード情報の取得に失敗しました。");
       setLoading(false);
       return;
     }
 
+    console.log("カード情報が取得されました");
+
+    // 支払い要求の作成
     const res = await fetch("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: totalAmount }), // 合計金額を送信
     });
 
-    const { clientSecret } = await res.json();
+    if (!res.ok) {
+      console.error("PaymentIntentの作成に失敗しました", await res.text()); // エラーメッセージを表示
+      alert("決済の準備に失敗しました。");
+      setLoading(false);
+      return;
+    }
 
+    const { clientSecret } = await res.json();
+    console.log("取得したclientSecret:", clientSecret);
+
+    // 支払い確認
     const { error, paymentIntent } = await stripe.confirmCardPayment(
       clientSecret,
       {
@@ -45,11 +62,15 @@ const CheckoutPage = () => {
     );
 
     if (error) {
-      console.log("Payment failed", error);
+      console.error("決済エラー:", error); // エラーの詳細をコンソールに表示
       alert("決済に失敗しました。もう一度お試しください。");
-    } else {
-      console.log("Payment succeeded", paymentIntent);
+    } else if (paymentIntent && paymentIntent.status === "succeeded") {
+      console.log("決済成功:", paymentIntent);
       alert("決済が完了しました！");
+      setBalance(balance - totalAmount); // 支払い後に所持金額を更新
+    } else {
+      console.error("決済状態の確認に失敗しました", paymentIntent); // 状態確認エラーの詳細
+      alert("決済の状態確認に失敗しました。");
     }
 
     setLoading(false);
@@ -58,6 +79,11 @@ const CheckoutPage = () => {
   return (
     <div className="container">
       <h2>商品購入ページ</h2>
+
+      {/* 所持金額の表示 */}
+      <div className="my-4">
+        <h4>所持金額: ¥{balance.toLocaleString()}</h4>
+      </div>
 
       {/* 合計金額の表示 */}
       <div className="order-summary my-4">
@@ -68,6 +94,7 @@ const CheckoutPage = () => {
         <h3>合計: ¥{totalAmount.toLocaleString()}</h3>
       </div>
 
+      {/* 支払いフォーム */}
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="card-element" className="form-label">
@@ -78,7 +105,7 @@ const CheckoutPage = () => {
         <button
           type="submit"
           className="btn btn-primary"
-          disabled={loading || !stripe}
+          disabled={loading || !stripe || balance < totalAmount} // 所持金額が足りない場合はボタンを無効化
         >
           {loading ? "処理中..." : "支払いを完了する"}
         </button>

@@ -1,7 +1,9 @@
 // server.js (Node.jsのサーバーサイドコード)
 const express = require("express");
 const Stripe = require("stripe");
-const stripe = Stripe("your-secret-key-here");
+const stripe = Stripe(
+  "sk_test_51QIR1sI7Vp8slT6TMGJ9OYt4LzRdYXOQoWOeWoGEilwLpzXEZsivH04zZlraFVT1Oo6RJXVPCgRXbZ8YCApUm8vA00bGxq4vv1"
+);
 
 const app = express();
 app.use(express.json());
