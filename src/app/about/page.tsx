@@ -33,7 +33,7 @@ export default function About() {
           <div className="col-md-6">
             <div className="card mb-4 shadow-sm">
               <div className="card-body text-center">
-                <h5 className="card-title">CEO - 須田 勝也</h5>
+                <h5 className="card-title">CEO - 山田 太郎</h5>
                 <p className="card-text text-muted">
                   お客様に最高のサービスを提供するためにリーダーシップを発揮しています。
                 </p>
@@ -43,7 +43,7 @@ export default function About() {
           <div className="col-md-6">
             <div className="card mb-4 shadow-sm">
               <div className="card-body text-center">
-                <h5 className="card-title">CTO - 須田 貴之</h5>
+                <h5 className="card-title">CTO - 鈴木 花子</h5>
                 <p className="card-text text-muted">
                   最先端のテクノロジーを駆使して、サイトを改善し続けています。
                 </p>
