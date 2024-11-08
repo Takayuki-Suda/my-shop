@@ -34,14 +34,23 @@ const HomePage = () => {
         <h2 className="section-title">my-shopを選ぶ理由</h2>
         <div className="features">
           <div className="feature">
+            <div className="feature-logo">
+              <div className="logo-inner">💎</div>
+            </div>
             <h3>品質の高い商品</h3>
             <p>私たちは、厳選された最高品質の商品だけを提供しています。</p>
           </div>
           <div className="feature">
+            <div className="feature-logo">
+              <div className="logo-inner">🌍</div>
+            </div>
             <h3>世界中へ配送</h3>
             <p>どこにいても、世界中どこへでもお届けします。</p>
           </div>
           <div className="feature">
+            <div className="feature-logo">
+              <div className="logo-inner">🔧</div>
+            </div>
             <h3>サポート体制</h3>
             <p>24時間体制でサポートを提供し、あなたの疑問にお答えします。</p>
           </div>
@@ -49,7 +58,7 @@ const HomePage = () => {
       </section>
 
       <footer className="footer">
-        <p>&copy; 2024 私たちのショップ. All rights reserved.</p>
+        <p>&copy; 2024 my-shop. All rights reserved.</p>
       </footer>
 
       <style jsx>{`
@@ -113,20 +122,34 @@ const HomePage = () => {
 
         .feature {
           background: white;
-          padding: 20px;
+          padding: 30px 20px; /* カード内のパディングを増やす */
           border-radius: 10px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease, box-shadow 0.3s ease;
+          display: flex;
+          align-items: center;
+          flex-direction: column;
         }
 
-        .feature:hover {
-          transform: translateY(-10px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        .logo-inner {
+          font-size: 1.5rem;
+          color: white;
+          transition: transform 0.6s ease;
+        }
+
+        .feature:hover .logo-inner {
+          transform: rotateY(360deg); /* ロゴがホバー時に3D回転 */
         }
 
         .feature h3 {
           font-size: 1.5rem;
-          margin-bottom: 10px;
+          margin: 10px 0; /* タイトルと説明文の間にスペース */
+        }
+
+        .feature p {
+          margin: 0;
+          text-align: center;
+          line-height: 1.5; /* テキストの行間を広く */
         }
 
         .footer {
