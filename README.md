@@ -1,4 +1,7 @@
+起動方法
 npm run dev
+http://localhost:3000/
+
 Strip を用いて決済の仕組みを行っている
 
 Stripe のテストカードを使用する場合、
