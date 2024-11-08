@@ -131,6 +131,11 @@ const HomePage = () => {
           flex-direction: column;
         }
 
+        .feature:hover {
+          transform: translateY(-10px); /* ホバー時に浮かせる効果 */
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* 浮かせたときの影を強調 */
+        }
+
         .logo-inner {
           font-size: 1.5rem;
           color: white;
