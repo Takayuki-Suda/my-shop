@@ -1,22 +1,21 @@
-"use client"; // クライアントサイドコンポーネントを明示
-
+"use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // 'next/navigation' を使用
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
-  const [isClient, setIsClient] = useState(false); // クライアントサイドかどうかを確認する状態
-  const router = useRouter(); // useRouterを初期化
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setIsClient(true); // クライアントサイドであることを設定
+    setIsClient(true);
   }, []);
 
   const handleClick = () => {
-    router.push("/products"); // ボタンがクリックされたら/productsページに遷移
+    router.push("/products");
   };
 
   if (!isClient) {
-    return null; // クライアントサイドではない場合、何も描画しない
+    return null;
   }
 
   return (
@@ -116,7 +115,13 @@ const HomePage = () => {
           background: white;
           padding: 20px;
           border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
 
         .feature h3 {
