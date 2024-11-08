@@ -178,11 +178,21 @@ const CheckoutPage = () => {
         </div>
         <button
           type="submit"
-          className="btn btn-primary"
+          className={`btn btn-primary ${
+            loading || !stripe || balance < totalAmount ? "disabled-btn" : ""
+          }`} // 無効時にクラスを追加
           disabled={loading || !stripe || balance < totalAmount} // 所持金額が足りない場合はボタンを無効化
         >
           {loading ? "処理中..." : "支払いを完了する"}
         </button>
+
+        <style jsx>{`
+          .disabled-btn {
+            background-color: #d6d6d6; // ボタンの背景色をグレーに
+            border-color: #cccccc; // ボーダーも薄く
+            cursor: not-allowed; // カーソルを「無効」に変更
+          }
+        `}</style>
       </form>
     </div>
   );
