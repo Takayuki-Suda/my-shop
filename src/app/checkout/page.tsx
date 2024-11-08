@@ -1,15 +1,34 @@
 "use client"; // クライアントサイドコンポーネントにする
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useCart } from "../../context/CartContext"; // カートコンテキストをインポート
 
 const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
-  const [balance, setBalance] = useState(10000); // 所持金額を10,000円で初期化
+  const [balance, setBalance] = useState<number | null>(null); // 初期状態ではnullにして、サーバーから取得
   const stripe = useStripe();
   const elements = useElements();
   const { subtotal, taxAmount, shippingFee, totalAmount } = useCart(); // カートの合計情報を取得
+
+  // ページ読み込み時に最新の所持金額を取得
+  useEffect(() => {
+    const fetchBalance = async () => {
+      try {
+        const response = await fetch("/api/get-balance");
+        const data = await response.json();
+        if (response.ok) {
+          setBalance(data.balance); // 最新の所持金額をセット
+        } else {
+          console.error("所持金額の取得に失敗しました:", data.message);
+        }
+      } catch (error) {
+        console.error("所持金額の取得中にエラーが発生しました:", error);
+      }
+    };
+
+    fetchBalance(); // 初回レンダリング時に最新の所持金額を取得
+  }, []); // 空の依存配列で、最初のレンダリング時のみ実行
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -67,7 +86,9 @@ const CheckoutPage = () => {
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
       console.log("決済成功:", paymentIntent);
       alert("決済が完了しました！");
-      setBalance(balance - totalAmount); // 支払い後に所持金額を更新
+
+      // 所持金額の更新（再取得）
+      await handlePaymentSuccess();
     } else {
       console.error("決済状態の確認に失敗しました", paymentIntent); // 状態確認エラーの詳細
       alert("決済の状態確認に失敗しました。");
@@ -75,6 +96,59 @@ const CheckoutPage = () => {
 
     setLoading(false);
   };
+
+  const handlePaymentSuccess = async () => {
+    try {
+      const response = await fetch("/api/updateBalance", {
+        method: "PATCH", // 所持金額の更新はPATCHリクエスト
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: 1, // ユーザーID
+          amount: totalAmount, // 支払金額
+        }),
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.error("所持金額の更新に失敗しました:", errorMessage); // エラーメッセージをログに出力
+        alert("所持金額の更新に失敗しました: " + errorMessage); // ユーザーにエラー通知
+        return;
+      }
+
+      const updatedUser = await response.json();
+      console.log("所持金額が更新されました:", updatedUser);
+      setBalance(updatedUser.balance); // 更新された所持金額を反映
+      alert("支払いが完了しました！");
+
+      // 支払い成功後に所持金額を再取得
+      const fetchBalance = async () => {
+        // 再取得関数をここでも定義
+        try {
+          const response = await fetch("/api/get-balance");
+          const data = await response.json();
+          if (response.ok) {
+            setBalance(data.balance); // 最新の所持金額をセット
+          } else {
+            console.error("所持金額の取得に失敗しました:", data.message);
+          }
+        } catch (error) {
+          console.error("所持金額の取得中にエラーが発生しました:", error);
+        }
+      };
+
+      fetchBalance(); // 最新の所持金額を再取得
+    } catch (error) {
+      console.error("決済後の所持金額更新中にエラーが発生しました:", error);
+      alert("決済後にエラーが発生しました。再度お試しください。");
+    }
+  };
+
+  // balanceがnullの場合、読み込み中を表示
+  if (balance === null) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container">

@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(50)
+  email   String  @unique @db.VarChar(100)
+  balance Int     @default(10000)
+  cart    Cart?   @relation
+}
+
+model Cart {
+  id       Int     @id @default(autoincrement())
+  user     User    @relation(fields: [userId], references: [id])
+  userId   Int     @unique // userId に @unique を追加して一対一にする
+  items    CartItem[]
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int     @default(1)
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  cartId    Int
+  cart      Cart    @relation(fields: [cartId], references: [id])
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  description String?   @db.VarChar(500)
+  price       Int
+  imageUrl    String?
+  cartItems   CartItem[]
+}
