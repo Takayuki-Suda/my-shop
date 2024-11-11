@@ -2,6 +2,8 @@
 npm run dev
 http://localhost:3000/
 
+動かない場合 package.json 等を見に行くことで読み込みが始まる
+
 Strip を用いて決済の仕組みを行っている
 
 Stripe のテストカードを使用する場合、
